@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kamal GUI</title>
+  <link rel="stylesheet" href="css/tailwind.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .chart-container {
+      min-height: 200px !important;
+      width: 100% !important;
+      position: relative !important;
+      visibility: visible !important;
+      display: block !important;
+    }
+
+    .metric-value {
+      min-height: 2.5rem;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+  <header class="bg-blue-600 text-white shadow-md">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold">Kamal GUI</h1>
+      <div class="flex items-center space-x-4">
+        <div class="flex items-center mr-4">
+          <input type="checkbox" id="hide-exited" class="mr-2" checked>
+          <label for="hide-exited">Hide exited containers</label>
+        </div>
+        <label class="text-white">Auto-refresh:</label>
+        <select id="refresh-interval" class="bg-white text-gray-900 px-2 py-1 rounded">
+          <option value="0">Off</option>
+          <option value="5" selected>5s</option>
+          <option value="10">10s</option>
+          <option value="30">30s</option>
+          <option value="60">1m</option>
+        </select>
+        <button id="refresh-now" class="bg-white text-blue-600 px-4 py-1 rounded hover:bg-gray-100">
+          Refresh Now
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-8">
+    <div id="containers-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Container cards will be generated here -->
+      <div class="col-span-full text-center text-gray-500 py-12">
+        Loading containers...
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-gray-800 text-white py-4">
+    <div class="container mx-auto px-4 text-center">
+      <p>Kamal GUI • <span id="version">v1.0.0</span></p>
+    </div>
+  </footer>
+
+  <!-- Template for container cards -->
+  <template id="container-template">
+    <div class="card container-card">
+      <div class="flex justify-between items-start mb-4">
+        <div class="max-w-[80%]">
+          <h2 class="text-xl font-bold container-name truncate" title=""></h2>
+          <p class="text-sm text-gray-500 container-id truncate" title=""></p>
+        </div>
+        <div class="px-2 py-1 rounded-full text-xs font-medium container-status"></div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <p class="metric">CPU Usage</p>
+          <p class="metric-value cpu-usage">-</p>
+        </div>
+        <div>
+          <p class="metric">Memory Usage</p>
+          <p class="metric-value memory-usage">-</p>
+        </div>
+        <div>
+          <p class="metric">Network I/O</p>
+          <p class="metric-value network-io">-</p>
+        </div>
+        <div>
+          <p class="metric">Disk I/O</p>
+          <p class="metric-value disk-io">-</p>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <p class="metric">Uptime</p>
+        <p class="metric-value uptime">-</p>
+      </div>
+
+      <div class="chart-container">
+        <canvas class="usage-chart"></canvas>
+      </div>
+    </div>
+  </template>
+
+  <script src="js/app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,25 @@
+{
+  "name": "kamalgui",
+  "version": "1.0.0",
+  "description": "Web GUI for Kamal",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "tailwindcss -i ./css/input.css -o ./public/css/tailwind.css --minify",
+    "watch:css": "tailwindcss -i ./css/input.css -o ./public/css/tailwind.css --watch"
+  },
+  "keywords": [
+    "docker",
+    "gui",
+    "monitoring"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.24",
+    "tailwindcss": "^3.3.2"
+  },
+  "dependencies": {
+    "chart.js": "^4.3.0"
+  }
+}

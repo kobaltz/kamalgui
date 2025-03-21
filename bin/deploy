@@ -1,0 +1,35 @@
+#!/bin/bash
+set -e
+
+# Configuration
+IMAGE_NAME="kamalgui"
+IMAGE_TAG=$(date +%Y%m%d%H%M%S)
+DOCKERHUB_USERNAME=kobaltz
+
+# Check Docker and buildx
+if ! docker buildx version > /dev/null 2>&1; then
+  echo "Error: Docker buildx is required for multi-architecture builds."
+  echo "Please make sure you have a recent version of Docker with buildx enabled."
+  exit 1
+fi
+
+# Setup buildx builder for multi-architecture builds
+echo "Setting up Docker buildx builder for multi-architecture builds..."
+BUILDER_NAME="multiarch-builder"
+
+if ! docker buildx inspect "$BUILDER_NAME" > /dev/null 2>&1; then
+  docker buildx create --name "$BUILDER_NAME" --driver docker-container --platform linux/amd64,linux/arm64 --use
+else
+  docker buildx use "$BUILDER_NAME"
+fi
+
+# Build and push for multiple architectures
+echo "Building and pushing Docker image for multiple architectures..."
+echo "Image: ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG}"
+
+docker buildx build \
+  --platform linux/amd64,linux/arm64 \
+  --tag ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG} \
+  --tag ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest \
+  --push \
+  .

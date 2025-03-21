@@ -1,0 +1,38 @@
+# Node dependencies
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Docker files
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Git
+.git
+.gitignore
+
+# Development folders
+.vscode
+.idea
+
+# Environment variables
+.env*
+!.env.example
+
+# Logs
+logs
+*.log
+
+# Build artifacts
+dist
+build
+
+# Images (they're copied separately if needed)
+images
+
+# Misc
+.DS_Store
+*.swp
+*.swo
