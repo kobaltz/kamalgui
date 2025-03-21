@@ -10,6 +10,11 @@ COPY . .
 RUN npm run build:css
 
 FROM nginx:alpine
+
+RUN apk update && \
+  apk upgrade --no-cache libxml2 libxslt expat && \
+  apk upgrade --no-cache
+
 COPY --from=build /app/public /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 

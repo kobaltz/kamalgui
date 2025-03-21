@@ -81,22 +81,11 @@ async function refreshData() {
     );
 
     if (runningContainers.length > 0) {
-      try {
-        const allStatsResponse = await fetchWithTimeout('/api/containers/stats?stream=false');
-
-        for (const containerId in allStatsResponse) {
-          if (allStatsResponse.hasOwnProperty(containerId) && runningContainers.includes(containerId)) {
-            processContainerStats(containerId, allStatsResponse[containerId]);
-          }
-        }
-      } catch (error) {
-        console.warn('Bulk stats request failed, falling back to individual requests:', error);
-        await Promise.all(
-          runningContainers.map(containerId =>
-            fetchContainerStats(containerId)
-          )
-        );
-      }
+      await Promise.all(
+        runningContainers.map(containerId =>
+          fetchContainerStats(containerId)
+        )
+      );
     }
   } catch (error) {
     console.error('Error fetching container data:', error);
@@ -215,6 +204,11 @@ function processContainerStats(containerId, stats) {
   const diskRead = stats.blkio_stats?.io_service_bytes_recursive?.find(stat => stat.op === 'Read')?.value || 0;
   const diskWrite = stats.blkio_stats?.io_service_bytes_recursive?.find(stat => stat.op === 'Write')?.value || 0;
 
+  let rxDelta = 0;
+  let txDelta = 0;
+  let readDelta = 0;
+  let writeDelta = 0;
+
   if (lastStats) {
     data.cpuHistory.shift();
     data.cpuHistory.push(cpuPercent);
@@ -226,11 +220,11 @@ function processContainerStats(containerId, stats) {
     data.diskReadHistory.shift();
     data.diskWriteHistory.shift();
 
-    const rxDelta = networkRx - (lastStats.networks ? Object.values(lastStats.networks).reduce((sum, net) => sum + net.rx_bytes, 0) : 0);
-    const txDelta = networkTx - (lastStats.networks ? Object.values(lastStats.networks).reduce((sum, net) => sum + net.tx_bytes, 0) : 0);
+    rxDelta = networkRx - (lastStats.networks ? Object.values(lastStats.networks).reduce((sum, net) => sum + net.rx_bytes, 0) : 0);
+    txDelta = networkTx - (lastStats.networks ? Object.values(lastStats.networks).reduce((sum, net) => sum + net.tx_bytes, 0) : 0);
 
-    const readDelta = diskRead - (lastStats.blkio_stats?.io_service_bytes_recursive?.find(stat => stat.op === 'Read')?.value || 0);
-    const writeDelta = diskWrite - (lastStats.blkio_stats?.io_service_bytes_recursive?.find(stat => stat.op === 'Write')?.value || 0);
+    readDelta = diskRead - (lastStats.blkio_stats?.io_service_bytes_recursive?.find(stat => stat.op === 'Read')?.value || 0);
+    writeDelta = diskWrite - (lastStats.blkio_stats?.io_service_bytes_recursive?.find(stat => stat.op === 'Write')?.value || 0);
 
     data.networkRxHistory.push(rxDelta);
     data.networkTxHistory.push(txDelta);
@@ -409,11 +403,19 @@ function initializeChart(containerId) {
   }
 
   const containerCard = document.querySelector(`.container-card[data-container-id="${containerId}"]`);
-  if (!containerCard) return;
+  if (!containerCard) {
+    return;
+  }
 
-  const canvas = containerCard.querySelector('.metrics-chart');
+  const canvas = containerCard.querySelector('.usage-chart');
+  if (!canvas) {
+    return;
+  }
+
   const ctx = canvas?.getContext('2d');
-  if (!ctx || !canvas) return;
+  if (!ctx) {
+    return;
+  }
 
   if (containerCard.chart) {
     try {
@@ -424,6 +426,12 @@ function initializeChart(containerId) {
   }
 
   try {
+    // Check if Chart is defined
+    if (typeof Chart === 'undefined') {
+      console.error('Chart.js library is not loaded or not available');
+      return;
+    }
+
     const chart = new Chart(ctx, {
       type: 'line',
       data: {
@@ -527,7 +535,7 @@ function initializeChart(containerId) {
       chart.update('none');
     }
   } catch (e) {
-    console.error('Error initializing chart:', e);
+    console.error(`Error initializing chart for container ${containerId}:`, e);
   }
 }
 

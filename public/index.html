@@ -83,11 +83,17 @@
         </div>
         <div>
           <p class="metric">Network I/O</p>
-          <p class="metric-value network-io">-</p>
+          <div class="flex flex-col">
+            <p class="metric-value"><span class="text-green-600">↓</span> <span class="network-rx">-</span></p>
+            <p class="metric-value"><span class="text-red-600">↑</span> <span class="network-tx">-</span></p>
+          </div>
         </div>
         <div>
           <p class="metric">Disk I/O</p>
-          <p class="metric-value disk-io">-</p>
+          <div class="flex flex-col">
+            <p class="metric-value"><span class="text-blue-600">R</span> <span class="disk-read">-</span></p>
+            <p class="metric-value"><span class="text-purple-600">W</span> <span class="disk-write">-</span></p>
+          </div>
         </div>
       </div>
 
